@@ -1,14 +1,14 @@
 import streamlit as st
 
-# Hàm respond_to_user trả về chuỗi
+# Hàm trả lời người dùng
 def respond_to_user(user_input: str) -> str:
     ui = user_input.lower().strip()
 
     # Chào người dùng
     if ui == "hi":
-        return "Xin chào quý khách! Tôi có thể giúp gì cho quý khách? ['Tư vấn mua hàng', 'Tra cứu bảo hành', 'Hỗ trợ kỹ thuật']"
+        return "['Tư vấn mua hàng', 'Tra cứu bảo hành', 'Hỗ trợ kỹ thuật']"
     elif ui == "hello":
-        return "Xin chào, bạn cần tôi giúp gì không? ['Tư vấn mua hàng', 'Tra cứu bảo hành', 'Hỗ trợ kỹ thuật']"
+        return "['Tư vấn mua hàng', 'Tra cứu bảo hành', 'Hỗ trợ kỹ thuật']"
 
     # Tư vấn mua hàng
     elif ui == "tư vấn mua hàng":
@@ -47,11 +47,19 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
+# Sidebar
+with st.sidebar:
+    st.markdown("## Hướng dẫn sử dụng")
+    st.write("- Gõ “Hi” hoặc “Hello” để bắt đầu.")
+    st.write("- Nhập từ khoá theo gợi ý của chatbot (ví dụ: 'Tư vấn mua hàng', 'Điện thoại', …).")
+    st.write("- Để xóa toàn bộ lịch sử, nhấn nút bên dưới.")
+    if st.button("Xoá lịch sử"):
+        st.session_state["chat_history"] = []
+
 # Khởi tạo session_state cho lịch sử trò chuyện
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
 
-# Tiêu đề
 st.title("Chatbot Hỗ Trợ Khách Hàng")
 
 # Hiển thị toàn bộ lịch sử trò chuyện
@@ -63,13 +71,8 @@ for chat_item in st.session_state["chat_history"]:
 
 # Ô nhập tin nhắn và xử lý đầu vào
 if prompt := st.chat_input("Nhập tin nhắn của bạn..."):
-    # Lưu tin nhắn người dùng
     st.session_state["chat_history"].append({"sender": "user", "message": prompt})
-
-    # Tính phản hồi và lưu
     bot_reply = respond_to_user(prompt)
     st.session_state["chat_history"].append({"sender": "assistant", "message": bot_reply})
-
-    # Hiển thị tin nhắn mới ngay lập tức
     st.chat_message("user").write(prompt)
     st.chat_message("assistant").write(bot_reply)
